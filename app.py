@@ -6,7 +6,7 @@ import os
 
 # Set page configuration
 st.set_page_config(
-    page_title="Heart Risk AI",
+    page_title="HeartAssistX",
     page_icon="❤️",
     layout="centered"
 )
@@ -140,7 +140,7 @@ def main():
     apply_custom_css(theme)
 
     # Main UI
-    st.title("Heart Risk AI")
+    st.title("HeartAssistX")
     st.markdown(f"##### Precise Patient Risk Assessment using Advanced Machine Learning")
     
     st.markdown("<br>", unsafe_allow_html=True)
