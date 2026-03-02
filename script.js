@@ -1,16 +1,19 @@
 let modelParams = null;
 
 // Function to load model parameters
-async function loadModel() {
+function initModel() {
     try {
-        const response = await fetch('model_params.json');
-        if (!response.ok) throw new Error('Failed to load model_params.json');
-        modelParams = await response.json();
-        
-        // Update UI with model info
-        document.getElementById('model-name-text').textContent = modelParams.model_name;
-        document.getElementById('accuracy-text').textContent = (modelParams.test_accuracy * 100).toFixed(2) + '%';
-        console.log("Model parameters loaded successfully.");
+        // Use the global variable from model_params.js
+        if (typeof MODEL_PARAMS !== 'undefined') {
+            modelParams = MODEL_PARAMS;
+            
+            // Update UI with model info
+            document.getElementById('model-name-text').textContent = modelParams.model_name;
+            document.getElementById('accuracy-text').textContent = (modelParams.test_accuracy * 100).toFixed(2) + '%';
+            console.log("Model parameters loaded successfully from global variable.");
+        } else {
+            throw new Error('MODEL_PARAMS not found. Make sure model_params.js is loaded.');
+        }
     } catch (error) {
         console.error("Error loading model:", error);
         document.getElementById('model-name-text').textContent = "Error loading model";
@@ -48,7 +51,7 @@ function predict(inputs) {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-    loadModel();
+    initModel();
 
     const themeToggle = document.getElementById('theme-toggle');
     const body = document.body;
