@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Risk AI - Static Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="light-mode">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="https://img.icons8.com/plasticine/100/000000/heart-with-pulse.png" alt="Heart Icon" class="logo">
+            <h2>Settings</h2>
+        </div>
+        <hr>
+        <div class="appearance-section">
+            <p><i class="fas fa-moon"></i> <strong>Theme</strong></p>
+            <div class="toggle-container">
+                <span class="mode-label">Mode</span>
+                <label id="theme-switch" class="switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+        <hr>
+        <div class="model-info">
+            <p><strong>Model:</strong> <span id="model-name-text">Loading...</span></p>
+            <p><strong>Test Accuracy:</strong> <span id="accuracy-text">Loading...</span></p>
+            <p class="caption">Based on 80-20 train-test split.</p>
+        </div>
+    </div>
+
+    <main class="content">
+        <header>
+            <h1>Heart Risk AI</h1>
+            <p class="subtitle">Intelligent Patient Assessment Dashboard</p>
+        </header>
+
+        <section class="risk-form-card">
+            <div class="card-header">
+                <h3><i class="fas fa-clipboard-list"></i> Clinical Indicators</h3>
+            </div>
+            <form id="risk-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" min="1" max="120" value="50" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sex">Sex</label>
+                        <select id="sex">
+                            <option value="1">Male</option>
+                            <option value="0">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cp" title="0: Typical Angina, 1: Atypical Angina, 2: Non-anginal, 3: Asymptomatic">Chest Pain Type</label>
+                        <select id="cp">
+                            <option value="0">Typical Angina (0)</option>
+                            <option value="1">Atypical Angina (1)</option>
+                            <option value="2">Non-anginal Pain (2)</option>
+                            <option value="3">Asymptomatic (3)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="trestbps">Resting BP (mm Hg)</label>
+                        <input type="number" id="trestbps" min="50" max="250" value="120" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="chol">Cholesterol (mg/dl)</label>
+                        <input type="number" id="chol" min="100" max="600" value="200" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fbs">Fasting BS > 120 mg/dl</label>
+                        <select id="fbs">
+                            <option value="0">False</option>
+                            <option value="1">True</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="restecg">Resting ECG Results</label>
+                        <select id="restecg">
+                            <option value="0">Normal (0)</option>
+                            <option value="1">ST-T Wave Abnormality (1)</option>
+                            <option value="2">LV Hypertrophy (2)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="thalach">Max Heart Rate</label>
+                        <input type="number" id="thalach" min="60" max="250" value="150" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exang">Exercise Angina</label>
+                        <select id="exang">
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="oldpeak">ST Depression (oldpeak)</label>
+                        <input type="number" id="oldpeak" min="0" max="10" step="0.1" value="1.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="slope">ST Segment Slope</label>
+                        <select id="slope">
+                            <option value="0">Upsloping (0)</option>
+                            <option value="1">Flat (1)</option>
+                            <option value="2">Downsloping (2)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ca">Major Vessels (0-4)</label>
+                        <select id="ca">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="thal">Thalassemia (Thal)</label>
+                        <select id="thal">
+                            <option value="1">Fixed Defect (1)</option>
+                            <option value="2">Normal (2)</option>
+                            <option value="3">Reversible Defect (3)</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" id="predict-btn">Generate Diagnostic Profile</button>
+            </form>
+        </section>
+
+        <section id="results-section" class="results-card hidden">
+            <h3>Diagnostic Analysis Outputs</h3>
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <span class="metric-label">Risk Probability</span>
+                    <span id="risk-score" class="metric-value">0%</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Model Confidence</span>
+                    <span id="confidence-score" class="metric-value">0%</span>
+                </div>
+            </div>
+            <div id="risk-alert" class="risk-alert">
+                <h4 id="alert-title">Results Ready</h4>
+                <p id="alert-text">Predicted risk category will appear here.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
