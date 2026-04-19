@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeartAssistX - Static Dashboard</title>
+    <title>HeartAssistX - Dual Version System</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="light-mode">
     <div class="sidebar">
@@ -14,6 +15,22 @@
             <h2>Settings</h2>
         </div>
         <hr>
+        
+        <!-- Toggle System Version -->
+        <div class="appearance-section system-toggle-box">
+            <p><i class="fas fa-server"></i> <strong>System Version</strong></p>
+            <div class="toggle-container">
+                <span class="mode-label" id="version-label">V1: Baseline ML</span>
+                <label id="version-switch" class="switch">
+                    <input type="checkbox" id="version-toggle">
+                    <span class="slider round"></span>
+                </label>
+                <span class="mode-label" id="version-label-v2">V2: AI Agent</span>
+            </div>
+            <p class="caption" id="version-desc" style="margin-top: 10px;">Direct prediction endpoint. No LLM integration.</p>
+        </div>
+        <hr>
+
         <div class="appearance-section">
             <p><i class="fas fa-moon"></i> <strong>Theme</strong></p>
             <div class="toggle-container">
@@ -25,17 +42,13 @@
             </div>
         </div>
         <hr>
-        <div class="model-info">
-            <p><strong>Model:</strong> <span id="model-name-text">Loading...</span></p>
-            <p><strong>Test Accuracy:</strong> <span id="accuracy-text">Loading...</span></p>
-            <p class="caption">Based on 80-20 train-test split.</p>
-        </div>
+        
     </div>
 
     <main class="content">
         <header>
-            <h1>HeartAssistX</h1>
-            <p class="subtitle">Intelligent Patient Assessment Dashboard</p>
+            <h1>HeartAssistX <span id="header-badge" class="badge v1-badge">V1</span></h1>
+            <p class="subtitle" id="main-subtitle">Intelligent Patient Assessment Dashboard</p>
         </header>
 
         <section class="risk-form-card">
@@ -133,6 +146,12 @@
             </form>
         </section>
 
+        <!-- Loading spinner -->
+        <div id="loading-spinner" class="hidden" style="text-align: center; padding: 20px;">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <p>Processing via API...</p>
+        </div>
+
         <section id="results-section" class="results-card hidden">
             <h3>Diagnostic Analysis Outputs</h3>
             <div class="metrics-grid">
@@ -140,19 +159,37 @@
                     <span class="metric-label">Risk Probability</span>
                     <span id="risk-score" class="metric-value">0%</span>
                 </div>
-                <div class="metric-item">
-                    <span class="metric-label">Model Confidence</span>
-                    <span id="confidence-score" class="metric-value">0%</span>
-                </div>
             </div>
             <div id="risk-alert" class="risk-alert">
                 <h4 id="alert-title">Results Ready</h4>
                 <p id="alert-text">Predicted risk category will appear here.</p>
             </div>
+
+            <!-- V2 ONLY SECTIONS -->
+            <div id="v2-results" class="hidden" style="margin-top: 2rem;">
+                
+                <div class="v2-card">
+                    <h4><i class="fas fa-question-circle"></i> Why this risk? (Top Factors)</h4>
+                    <ul id="top-factors-list" style="margin: 10px 0; padding-left: 20px;">
+                        <!-- JS injects top factors here -->
+                    </ul>
+                    <p id="ai-explanation" style="font-style: italic; color: #555; margin-top: 10px;">explanation goes here</p>
+                </div>
+
+                <div class="v2-card" style="margin-top: 1rem; border-left: 4px solid #10b981;">
+                    <h4><i class="fas fa-heartbeat"></i> AI Lifestyle Recommendations</h4>
+                    <p id="ai-recommendation" style="margin-top: 10px;"></p>
+                </div>
+
+                <div class="v2-card" style="margin-top: 1rem;">
+                    <h4><i class="fas fa-chart-line"></i> Patient History (Memory)</h4>
+                    <canvas id="historyChart" width="400" height="150"></canvas>
+                </div>
+            </div>
+
         </section>
     </main>
 
-    <script src="model_params.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

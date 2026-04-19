@@ -1,61 +1,13 @@
-let modelParams = null;
+// API Base URL (Assuming FastAPI runs locally on 8000)
+const API_BASE = 'http://localhost:8000';
+let currentVersion = 'v1'; // Default
+let historyChartInstance = null;
 
-// Function to load model parameters
-function initModel() {
-    try {
-        // Use the global variable from model_params.js
-        if (typeof MODEL_PARAMS !== 'undefined') {
-            modelParams = MODEL_PARAMS;
-            
-            // Update UI with model info
-            document.getElementById('model-name-text').textContent = modelParams.model_name;
-            document.getElementById('accuracy-text').textContent = (modelParams.test_accuracy * 100).toFixed(2) + '%';
-            console.log("Model parameters loaded successfully from global variable.");
-        } else {
-            throw new Error('MODEL_PARAMS not found. Make sure model_params.js is loaded.');
-        }
-    } catch (error) {
-        console.error("Error loading model:", error);
-        document.getElementById('model-name-text').textContent = "Error loading model";
-    }
-}
-
-// Sigmoid function
-function sigmoid(z) {
-    return 1 / (1 + Math.exp(-z));
-}
-
-// Prediction function
-function predict(inputs) {
-    if (!modelParams) return null;
-
-    const { coefficients, intercept, scaler, feature_names } = modelParams;
-    let z = intercept;
-
-    // Scaling and Dot Product
-    for (let i = 0; i < feature_names.length; i++) {
-        const rawValue = inputs[feature_names[i]];
-        const mean = scaler.mean[i];
-        const scale = scaler.scale[i];
-        
-        // Scale the input: (x - mean) / scale
-        const scaledValue = (rawValue - mean) / scale;
-        
-        // Add to z: W_i * X_i
-        z += coefficients[i] * scaledValue;
-    }
-
-    const probability = sigmoid(z);
-    return probability;
-}
-
-// Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-    initModel();
-
     const themeToggle = document.getElementById('theme-toggle');
+    const versionToggle = document.getElementById('version-toggle');
     const body = document.body;
-
+    
     // Theme Toggle Logic
     themeToggle.addEventListener('change', () => {
         if (themeToggle.checked) {
@@ -67,15 +19,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Version Toggle Logic
+    const headerBadge = document.getElementById('header-badge');
+    const versionDesc = document.getElementById('version-desc');
+    const v2ResultsContainer = document.getElementById('v2-results');
+
+    versionToggle.addEventListener('change', () => {
+        if (versionToggle.checked) {
+            currentVersion = 'v2';
+            headerBadge.textContent = 'V2';
+            headerBadge.className = 'badge v2-badge';
+            versionDesc.textContent = 'Agentic AI integration. Explainability, Memory, and LLM Recommendations enabled.';
+            v2ResultsContainer.classList.remove('hidden');
+        } else {
+            currentVersion = 'v1';
+            headerBadge.textContent = 'V1';
+            headerBadge.className = 'badge v1-badge';
+            versionDesc.textContent = 'Direct prediction endpoint. No LLM integration.';
+            v2ResultsContainer.classList.add('hidden');
+        }
+        // Hide results on switch
+        document.getElementById('results-section').classList.add('hidden');
+    });
+
     // Form Submission
     const riskForm = document.getElementById('risk-form');
-    riskForm.addEventListener('submit', (e) => {
+    riskForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-
-        if (!modelParams) {
-            alert("Model is still loading or failed to load. Please refresh.");
-            return;
-        }
 
         const inputs = {
             "age": parseFloat(document.getElementById('age').value),
@@ -93,38 +63,126 @@ document.addEventListener('DOMContentLoaded', () => {
             "thal": parseInt(document.getElementById('thal').value)
         };
 
-        const prob = predict(inputs);
-        displayResults(prob);
+        const btn = document.getElementById('predict-btn');
+        const spinner = document.getElementById('loading-spinner');
+        const resultsSection = document.getElementById('results-section');
+        
+        btn.disabled = true;
+        spinner.classList.remove('hidden');
+        resultsSection.classList.add('hidden');
+
+        try {
+            if (currentVersion === 'v1') {
+                await fetchV1(inputs);
+            } else {
+                await fetchV2(inputs);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error communicating with Backend. Make sure FastAPI is running on port 8000.");
+        } finally {
+            btn.disabled = false;
+            spinner.classList.add('hidden');
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
     });
 });
 
-function displayResults(prob) {
-    const resultsSection = document.getElementById('results-section');
-    const riskScore = document.getElementById('risk-score');
-    const confidenceScore = document.getElementById('confidence-score');
+async function fetchV1(inputs) {
+    const response = await fetch(`${API_BASE}/v1/predict`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(inputs)
+    });
+    if (!response.ok) throw new Error("API Error");
+    const data = await response.json();
+    
+    displayV1Results(data.risk_probability, data.label);
+}
+
+async function fetchV2(inputs) {
+    const response = await fetch(`${API_BASE}/v2/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(inputs)
+    });
+    if (!response.ok) throw new Error("API Error");
+    const data = await response.json();
+    
+    displayV1Results(data.prediction.score, data.prediction.label);
+    
+    // V2 Data
+    document.getElementById('v2-results').classList.remove('hidden');
+    
+    // Top Factors
+    const list = document.getElementById('top-factors-list');
+    list.innerHTML = '';
+    data.top_factors.forEach(f => {
+        const li = document.createElement('li');
+        li.textContent = `${f.feature.toUpperCase()}: ${f.contribution.toFixed(4)}`;
+        list.appendChild(li);
+    });
+
+    // LLM Explanation & Recommendation
+    document.getElementById('ai-explanation').textContent = data.explanation;
+    document.getElementById('ai-recommendation').textContent = data.recommendation;
+
+    // Load History
+    await updateHistoryChart();
+}
+
+function displayV1Results(prob, label) {
+    document.getElementById('results-section').classList.remove('hidden');
+    
+    const percentage = (prob * 100).toFixed(1) + '%';
+    document.getElementById('risk-score').textContent = percentage;
+
     const riskAlert = document.getElementById('risk-alert');
     const alertTitle = document.getElementById('alert-title');
     const alertText = document.getElementById('alert-text');
 
-    resultsSection.classList.remove('hidden');
-    
-    const percentage = (prob * 100).toFixed(1) + '%';
-    riskScore.textContent = percentage;
-
-    const isHighRisk = prob >= 0.5;
-    const confidence = isHighRisk ? prob : (1 - prob);
-    confidenceScore.textContent = (confidence * 100).toFixed(1) + '%';
-
-    if (isHighRisk) {
+    if (label === 'High Risk') {
         riskAlert.className = 'risk-alert alert-high';
         alertTitle.textContent = '🚨 HIGH RISK ALERT';
-        alertText.textContent = 'Diagnostic indicators suggest high cardiovascular risk. Immediate clinical consultation is prioritized.';
+        alertText.textContent = 'Diagnostic indicators suggest high cardiovascular risk.';
     } else {
         riskAlert.className = 'risk-alert alert-low';
         alertTitle.textContent = '✅ LOW RISK OBSERVED';
-        alertText.textContent = 'Clinical metrics align with low risk profiles. Continue routine wellness and preventative measures.';
+        alertText.textContent = 'Clinical metrics align with low risk profiles.';
     }
+}
 
-    // Scroll to results
-    resultsSection.scrollIntoView({ behavior: 'smooth' });
+async function updateHistoryChart() {
+    const res = await fetch(`${API_BASE}/v2/history`);
+    const history = await res.json();
+    
+    if (historyChartInstance) {
+        historyChartInstance.destroy();
+    }
+    
+    const labels = history.map((_, i) => `Entry ${i+1}`);
+    const dataPoints = history.map(h => h.risk_score * 100);
+
+    const ctx = document.getElementById('historyChart').getContext('2d');
+    historyChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Risk Score (%)',
+                data: dataPoints,
+                borderColor: '#ef4444',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
 }

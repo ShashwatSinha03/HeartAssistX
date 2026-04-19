@@ -371,3 +371,42 @@ button:active {
         padding: 2rem;
     }
 }
+
+.hidden {
+    display: none !important;
+}
+
+.badge {
+    font-size: 0.9rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-left: 10px;
+    color: #fff;
+    font-weight: bold;
+}
+
+.v1-badge { background-color: #6c757d; }
+.v2-badge { background-color: #10b981; }
+
+.v2-card {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+}
+
+body.dark-mode .v2-card {
+    background: #2a2a2a;
+    border: 1px solid var(--border-dark);
+}
+
+.system-toggle-box {
+    background: #eef2ff;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+body.dark-mode .system-toggle-box {
+    background: #1e1e2f;
+}
