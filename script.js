@@ -1,5 +1,5 @@
 // API Base URL (Assuming FastAPI runs locally on 8000)
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'http://127.0.0.1:8000';
 let currentVersion = 'v1'; // Default
 let historyChartInstance = null;
 
