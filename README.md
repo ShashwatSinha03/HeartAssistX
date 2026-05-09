@@ -1,39 +1,32 @@
-# Project 3: HeartAssistX – Intelligent Patient Risk Assessment System
+# HeartAssistX: Intelligent Patient Risk Assessment
 
-## From Predictive Analytics to Clinical Decision Support
+> **From Predictive Analytics to Clinical Decision Support.**
 
-### Project Overview
-HeartAssistX is an **AI-driven clinical analytics system** designed to predict the risk of cardiovascular disease in patients, evolving from classical statistical modelling into an intelligent diagnostic assistant.
+HeartAssistX is an AI-driven clinical analytics system designed to bridge the gap between raw physiological data and actionable medical insights. It transitions traditional heart disease prediction into a modern, intelligent diagnostic assistant.
 
-- **Milestone 1:** Implementation of classical machine learning techniques (Logistic Regression, Decision Trees) on UCI Heart Disease data to identify key physiological drivers of cardiac risk.
-- **Milestone 2:** Extension of the system into an intelligent interface that provides real-time risk probability, confidence scoring, and clinical category assessment for proactive patient care.
+## The Problem
+Cardiovascular diseases (CVDs) are the leading cause of death globally. Early detection is critical, yet clinical datasets are often complex, making it difficult for practitioners to quickly quantify risk without sophisticated statistical tools. The challenge lies in identifying the subtle physiological drivers of cardiac risk while maintaining high diagnostic reliability.
 
----
+## The Solution
+HeartAssistX solves this by implementing a high-fidelity machine learning pipeline that processes UCI Heart Disease data to identify high-risk patients with precision. 
 
-### Team Information
-**Section:** D  
-**Topic:** Intelligent Patient Risk Assessment System
+- **Intelligence**: Evolved from classical statistical modeling into an agentic interface that provides real-time risk probability and confidence scoring.
+- **Precision**: Utilizes regularized Logistic Regression ($C=0.1$) to ensure the model generalizes well to new patient data, achieving a **88.52% test accuracy**.
+- **Clinical Design**: Features a specialized dual-mode theme system (Clinical Red/White & High-Contrast Dark) tailored for low-latency clinical environments.
 
-| Student ID | Name | Role |
-| :--- | :--- | :--- |
-| **2401010438** | Shashwat Sinha | Lead Developer / ML Engineer |
-| **2401010442** | Shivam Mishra | Data Analyst / Frontend |
-| **2401010011** | Aaryan Yadav | Research / Documentation |
+## Technology Stack
+- **Engine**: Scikit-Learn (Logistic Regression, Decision Trees)
+- **Logic**: Python (FastAPI, Pandas, NumPy)
+- **Interface**: Streamlit & Static Web (HTML5/CSS3/JS)
+- **Deployment**: Portable static web agent for serverless infrastructure.
 
----
-
-### Technology Stack
-| Component | Technology |
+## Key Performance
+| Metric | Value |
 | :--- | :--- |
-| **ML Models (M1)** | Logistic Regression, Decision Tree (Scikit-Learn) |
-| **Backend / Logic** | Python (joblib, pandas, NumPy) |
-| **Web Infrastructure** | Streamlit (Python) & Static Web (HTML5, CSS3, JS) |
-| **Deployment** | Vercel / GitHub Pages / Streamlit Cloud |
+| **Model Accuracy** | 88.52% |
+| **Regularization** | L2 (C=0.1) |
+| **Target Data** | UCI Heart Disease Repository |
 
 ---
-
-### Key Features
-- **Robustness**: Logistic Regression regularized ($C=0.1$) to prevent overfitting.
-- **Performance**: High-fidelity prediction with **88.52% Test Accuracy**.
-- **User Experience**: Dual-mode theme system (Subtle Red/White & Red/Black) for clinical environments.
-- **Portability**: Exported as a static static web agent for serverless deployment.
+**Lead Developer:** Shashwat Sinha  
+**Core Team:** Shivam Mishra, Aaryan Yadav
